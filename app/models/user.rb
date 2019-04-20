@@ -8,6 +8,15 @@ class User < ApplicationRecord
     foreign_key: :submitter_id,
     class_name: :ShortenedUrl
 
+  has_many :visits,
+    primary_key: :id,
+    foreign_key: :user_id,
+    class_name: :Visit
+  
+  has_many :visited_urls,
+    through: :visits,
+    source: :visited_url
+
   def shorten_url(long_url)
     return false if self.id.nil?
     short_url = ShortenedUrl.random_code
