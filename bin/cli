@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require_relative '../app/models/user'
+require_relative '../app/models/visit'
+require_relative '../app/models/shortened_url'
+
+def login
+  while true
+    puts "Input your email:"
+    email = gets.chomp
+    user = User.where(email: email).first
+    return user if user
+    puts "User does not exist"
+    puts
+  end
+end
+
+def options
+  while true
+    puts "What do you want to do?"
+    puts "0. Create shortened URL"
+    puts "1. Visit shortened URL"
+    option = gets.chomp
+    if option == '0'
+      return 0
+    elsif option == '1'
+      return 1
+    end
+    puts "Not an option!"
+  end
+end
+
+def create_url
+end
