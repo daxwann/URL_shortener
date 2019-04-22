@@ -10,17 +10,11 @@ require_relative '../app/models/shortened_url.rb'
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-jeff = User.new(email: "jeff@gmail.com")
-dax = User.new(email: "dax@gmail.com")
-stacey = User.new(email: "stacey@gmail.com")
-amy = User.new(email: "amy@gmail.com")
-steve = User.new(email: "steve@gmail.com")
-
-jeff.save
-dax.save
-stacey.save
-amy.save
-steve.save
+jeff = User.create!(email: "jeff@gmail.com")
+dax = User.create!(email: "dax@gmail.com")
+stacey = User.create!(email: "stacey@gmail.com")
+amy = User.create!(email: "amy@gmail.com")
+steve = User.create!(email: "steve@gmail.com")
 
 u1 = jeff.shorten_url("www.google.com")
 u2 = dax.shorten_url("www.espn.com")
@@ -43,4 +37,18 @@ Visit.record_visit!(dax, u7)
 Visit.record_visit!(steve, u1)
 Visit.record_visit!(amy, u4)
 
+social = TagTopic.create!(name: 'Social media')
+sports = TagTopic.create!(name: 'Sports')
+mail = TagTopic.create!(name: 'Mail')
+tech = TagTopic.create!(name: 'Technology')
+search = TagTopic.create!(name: 'Search')
+
+Tagging.create!(url_id: u1.id, topic_id: search.id)
+Tagging.create!(url_id: u1.id, topic_id: tech.id)
+Tagging.create!(url_id: u2.id, topic_id: sports.id)
+Tagging.create!(url_id: u3.id, topic_id: social.id)
+Tagging.create!(url_id: u4.id, topic_id: social.id)
+Tagging.create!(url_id: u5.id, topic_id: social.id)
+Tagging.create!(url_id: u6.id, topic_id: mail.id)
+Tagging.create!(url_id: u7.id, topic_id: tech.id)
 
