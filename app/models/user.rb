@@ -20,8 +20,8 @@ class User < ApplicationRecord
   def shorten_url(long_url)
     return false if self.id.nil?
     short_url = ShortenedUrl.random_code
-    shortened_url = ShortenedUrl.new(long_url: long_url, submitter_id: self.id, short_url: short_url)
-    return shortened_url if shortened_url.save!
+    shortened_url = ShortenedUrl.create!(long_url: long_url, submitter_id: self.id, short_url: short_url)
+    return shortened_url if shortened_url
     false
   end
 end

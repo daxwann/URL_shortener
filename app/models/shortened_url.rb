@@ -1,6 +1,7 @@
 class ShortenedUrl < ApplicationRecord
   validates :short_url, :long_url, presence: true, uniqueness: true
   validates :submitter_id, presence: true
+  validate :no_spamming, :nonpremium_max
 
   belongs_to :submitter,
     primary_key: :id,
@@ -44,5 +45,26 @@ class ShortenedUrl < ApplicationRecord
 
   def num_recent_uniques
     self.visitors.where("visits.created_at >= ?", 10.minutes.ago).distinct.count
+  end
+
+  private
+
+  def no_spamming
+    last_minute_count = ShortenedUrl
+      .where('created_at >= ?', 1.minute.ago)
+      .where(submitter: submitter_id)
+      .count
+
+    errors[:maximum] << 'of five shortened URLs per minute' if last_minute_count >= 5
+  end
+
+  def nonpremium_max
+    return if User.find(self.submitter).premium
+
+    total_urls = ShortenedUrl
+      .where(submitter: submitter_id)
+      .count
+    
+    errors[:only] << 'premium members can create more than five shortened URLs' if total_urls >= 5
   end
 end
