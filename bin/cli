@@ -3,10 +3,12 @@
 require_relative '../app/models/user'
 require_relative '../app/models/visit'
 require_relative '../app/models/shortened_url'
+require 'launchy'
 
 def login
   while true
     puts "Input your email:"
+    print "> "
     email = gets.chomp
     user = User.where(email: email).first
     return user if user
@@ -20,6 +22,7 @@ def options
     puts "What do you want to do?"
     puts "0. Create shortened URL"
     puts "1. Visit shortened URL"
+    print "> "
     option = gets.chomp
     if option == '0'
       return 0
@@ -30,5 +33,50 @@ def options
   end
 end
 
-def create_url
+def create_url(user)
+  return false if user.id.nil?
+  puts "Type in your long URL"
+  print "> "
+  long_url = gets.chomp
+  shortened_url = user.shorten_url(long_url)
+  if shortened_url
+    puts "Short URL is #{shortened_url.short_url}"
+    puts "Goodbye!"
+  end
+  false
 end
+
+def visit_url(user)
+  return false if user.id.nil?
+  while true
+    puts "Type in the shortened URL"
+    print "> "
+    input_url = gets.chomp
+    url = ShortenedUrl.where(short_url: input_url).first
+    return url if url
+    puts "Incorrect shortened URL"
+    puts
+  end
+end
+
+def launch_url(shortened_url)
+  return false if shortened_url.id.nil?
+  uri = shortened_url.long_url
+  Launchy.open( uri )
+  puts "Launching #{uri}"
+  puts "Goodbye!"
+  return true
+end
+
+def url_shortener
+  user = login
+  choice = options
+  if choice == 0
+    create_url(user)
+  elsif choice == 1
+    url = visit_url(user)
+    launch_url(url)
+  end
+end
+
+url_shortener
