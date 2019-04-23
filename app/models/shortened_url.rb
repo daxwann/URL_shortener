@@ -11,7 +11,8 @@ class ShortenedUrl < ApplicationRecord
   has_many :visits,
     primary_key: :id,
     foreign_key: :url_id,
-    class_name: :Visit
+    class_name: :Visit,
+    dependent: :destroy
 
   has_many :visitors,
     through: :visits,
@@ -45,6 +46,26 @@ class ShortenedUrl < ApplicationRecord
 
   def num_recent_uniques
     self.visitors.where("visits.created_at >= ?", 10.minutes.ago).distinct.count
+  end
+
+  def self.prune(n)
+    ShortenedUrl
+      .joins(:submitter)
+      .joins('LEFT JOIN visits ON
+      visits.url_id = shortened_urls.id')
+      .where("(shortened_urls.id IN (
+        SELECT
+          shortened_urls.id
+        FROM
+          shortened_urls
+        JOIN
+          visits ON visits.url_id =
+          shortened_urls.id
+        GROUP BY shortened_urls.id
+        HAVING MAX(visits.created_at) <
+        \'#{n.minute.ago}\'))
+        AND users.premium = \'false\'")
+        .destroy_all
   end
 
   private
